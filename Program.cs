@@ -37,7 +37,19 @@ builder.Services.AddDbContext<SmartParkingContext>(options =>
 // register AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000") // 允许特定域
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials(); // 允许凭证（JWT、Cookies等）传递
+    });
+});
+
 var app = builder.Build();
+app.UseCors("CorsPolicy");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
