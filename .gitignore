@@ -31,3 +31,5 @@ node_modules/
 
 # NuGet packages
 *.nupkg
+appsettings.json
+appsettings.Development.json
