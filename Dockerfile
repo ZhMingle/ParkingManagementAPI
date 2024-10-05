@@ -6,11 +6,10 @@ EXPOSE 443
 
 # 使用 .NET 8.0 SDK 镜像进行构建和发布
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
-COPY ["ParkingManagementAPI/ParkingManagementAPI.csproj", "ParkingManagementAPI/"]
-RUN dotnet restore "ParkingManagementAPI/ParkingManagementAPI.csproj"
+WORKDIR /app
+COPY ["ParkingManagementAPI.csproj", "."]
+RUN dotnet restore "ParkingManagementAPI.csproj"
 COPY . .
-WORKDIR "/src/ParkingManagementAPI"
 RUN dotnet build "ParkingManagementAPI.csproj" -c Release -o /app/build
 
 FROM build AS publish
