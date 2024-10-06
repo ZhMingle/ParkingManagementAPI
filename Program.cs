@@ -3,6 +3,7 @@ using ParkingManagementAPI.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using ParkingManagementAPI.utils;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -28,9 +29,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddControllers();
-builder.Services.AddSwaggerGen();
-
 builder.Services.AddDbContext<SmartParkingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -48,17 +46,22 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddControllers(options =>
+{
+    options.Conventions.Add(new KebabCaseRoutingConvention());
+});
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 app.UseCors("CorsPolicy");
 
-// Configure the HTTP request pipeline.
 
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseDeveloperExceptionPage();
 
 
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

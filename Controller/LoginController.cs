@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using BCrypt.Net;
 
 
-[Route("api/[controller]")]
+[Route("api/auth")]
 [ApiController]
 public class AuthController : ControllerBase
 {
