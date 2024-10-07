@@ -11,25 +11,25 @@ namespace ParkingManagementAPI.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class OrderController : ControllerBase
+    public class CustomerOrderController : ControllerBase
     {
         private readonly SmartParkingContext _context;
-        public OrderController(SmartParkingContext context)
+        public CustomerOrderController(SmartParkingContext context)
         {
             _context = context;
         }
         // GET: api/order
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
+        [HttpGet("")]
+        public async Task<ActionResult<IEnumerable<CustomerOrder>>> GetOrders()
         {
-            return await _context.Orders
+            return await _context.CustomerOrders
                 .Include(o => o.ParkingSpace)
                 .ToListAsync();
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetOrder(int id)
+        public async Task<ActionResult<CustomerOrder>> GetOrder(int id)
         {
-            var order = await _context.Orders
+            var order = await _context.CustomerOrders
             .Include(o => o.ParkingSpace)
             .FirstOrDefaultAsync(o => o.Id == id);
             if (order == null) return NotFound();
@@ -38,7 +38,7 @@ namespace ParkingManagementAPI.Controller
 
         // POST: api/order
         [HttpPost]
-        public async Task<ActionResult<Order>> CreateOrder(Order order)
+        public async Task<ActionResult<CustomerOrder>> CreateOrder(CustomerOrder order)
         {
             // 数据验证
             if (!ModelState.IsValid)
@@ -47,7 +47,7 @@ namespace ParkingManagementAPI.Controller
             }
 
             // 添加订单到数据库
-            _context.Orders.Add(order);
+            _context.CustomerOrders.Add(order);
             await _context.SaveChangesAsync();
 
             // 返回创建的订单信息
@@ -56,11 +56,11 @@ namespace ParkingManagementAPI.Controller
 
         // PUT: api/order/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOrder(int id, Order updatedOrder)
+        public async Task<IActionResult> UpdateOrder(int id, CustomerOrder updatedOrder)
         {
             if (id != updatedOrder.Id)
             {
-                return BadRequest("Order ID mismatch");
+                return BadRequest("CustomerOrder ID mismatch");
             }
 
             _context.Entry(updatedOrder).State = EntityState.Modified;
@@ -88,13 +88,13 @@ namespace ParkingManagementAPI.Controller
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrder(int id)
         {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.CustomerOrders.FindAsync(id);
             if (order == null)
             {
                 return NotFound();
             }
 
-            _context.Orders.Remove(order);
+            _context.CustomerOrders.Remove(order);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -103,7 +103,7 @@ namespace ParkingManagementAPI.Controller
         // 检查订单是否存在
         private bool OrderExists(int id)
         {
-            return _context.Orders.Any(e => e.Id == id);
+            return _context.CustomerOrders.Any(e => e.Id == id);
         }
     }
 }

@@ -51,6 +51,7 @@ builder.Services.AddControllers(options =>
     options.Conventions.Add(new KebabCaseRoutingConvention());
 });
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 app.UseCors("CorsPolicy");

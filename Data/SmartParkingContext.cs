@@ -14,7 +14,7 @@ namespace ParkingManagementAPI.Data
         }
 
         public DbSet<SystemUser> SystemUsers { get; set; }
-        public DbSet<Order> Orders { get; set; }
+        public DbSet<CustomerOrder> CustomerOrders { get; set; }
         public DbSet<ParkingSpace> ParkingSpaces { get; set; }
     }
 }
