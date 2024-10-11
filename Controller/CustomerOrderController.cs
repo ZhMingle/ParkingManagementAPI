@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using ParkingManagementAPI.Data;
 using ParkingManagementAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using ParkingManagementAPI.Models.DTO;
 
 namespace ParkingManagementAPI.Controller
 {
@@ -19,10 +20,13 @@ namespace ParkingManagementAPI.Controller
             _context = context;
         }
         // GET: api/order
-        [HttpGet("")]
-        public async Task<ActionResult<IEnumerable<CustomerOrder>>> GetOrders()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<CustomerOrder>>> GetOrders([FromQuery] PagingParametersDTO pagingParameters)
         {
             return await _context.CustomerOrders
+                .OrderBy(o => o.StartTime)
+                 .Skip((pagingParameters.PageNumber - 1) * pagingParameters.PageSizeLimit)
+            .Take(pagingParameters.PageSizeLimit)
                 .Include(o => o.ParkingSpace)
                 .ToListAsync();
         }
