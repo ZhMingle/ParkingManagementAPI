@@ -93,7 +93,7 @@ namespace ParkingManagementAPI.Controller
             content.Add(fileContent, "upload", Path.GetFileName(filePath));
 
             // 添加 Authorization Token 到请求头
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", "3700483d10b1ee7098ae84b4c07c018badd73315");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", "");
 
             var response = await client.PostAsync("https://api.platerecognizer.com/v1/plate-reader/", content);
 
