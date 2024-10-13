@@ -7,6 +7,7 @@ using ParkingManagementAPI.Data;
 using ParkingManagementAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using ParkingManagementAPI.Models.DTO;
+using ParkingManagementAPI.Services;
 
 namespace ParkingManagementAPI.Controller
 {
@@ -15,9 +16,11 @@ namespace ParkingManagementAPI.Controller
     public class CustomerOrderController : ControllerBase
     {
         private readonly SmartParkingContext _context;
-        public CustomerOrderController(SmartParkingContext context)
+        private readonly CustomerOrderService _customerOrderService;
+        public CustomerOrderController(SmartParkingContext context, CustomerOrderService customerOrderService)
         {
             _context = context;
+            _customerOrderService = customerOrderService;
         }
         // GET: api/order
         [HttpGet]
@@ -27,14 +30,12 @@ namespace ParkingManagementAPI.Controller
                 .OrderBy(o => o.StartTime)
                  .Skip((pagingParameters.PageNumber - 1) * pagingParameters.PageSizeLimit)
             .Take(pagingParameters.PageSizeLimit)
-                .Include(o => o.ParkingSpace)
                 .ToListAsync();
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<CustomerOrder>> GetOrder(int id)
         {
             var order = await _context.CustomerOrders
-            .Include(o => o.ParkingSpace)
             .FirstOrDefaultAsync(o => o.Id == id);
             if (order == null) return NotFound();
             return order;
@@ -44,18 +45,8 @@ namespace ParkingManagementAPI.Controller
         [HttpPost]
         public async Task<ActionResult<CustomerOrder>> CreateOrder(CustomerOrder order)
         {
-            // 数据验证
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            // 添加订单到数据库
-            _context.CustomerOrders.Add(order);
-            await _context.SaveChangesAsync();
-
-            // 返回创建的订单信息
-            return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, order);
+            var createdOrder = await _customerOrderService.CreateOrderAsync(order);
+            return CreatedAtAction(nameof(GetOrder), new { id = createdOrder.Id }, createdOrder);
         }
 
         // PUT: api/order/{id}

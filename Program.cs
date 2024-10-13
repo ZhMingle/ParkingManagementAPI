@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using ParkingManagementAPI.utils;
+using ParkingManagementAPI.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -34,7 +35,7 @@ builder.Services.AddDbContext<SmartParkingContext>(options =>
 
 // register AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
-
+builder.Services.AddScoped<CustomerOrderService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
@@ -56,7 +57,7 @@ builder.Services.AddHttpClient();
 var app = builder.Build();
 app.UseCors("CorsPolicy");
 
-
+app.UseStaticFiles(); // 使静态文件（如图片）可访问
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseDeveloperExceptionPage();

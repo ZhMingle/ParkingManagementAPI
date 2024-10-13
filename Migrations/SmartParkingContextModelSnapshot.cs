@@ -22,7 +22,7 @@ namespace ParkingManagementAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ParkingManagementAPI.Models.Order", b =>
+            modelBuilder.Entity("ParkingManagementAPI.Models.CustomerOrder", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,11 +33,13 @@ namespace ParkingManagementAPI.Migrations
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ParkingSpaceId")
-                        .HasColumnType("int");
+                    b.Property<string>("PlateImage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ParkingSpotId")
-                        .HasColumnType("int");
+                    b.Property<string>("PlateNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -45,14 +47,16 @@ namespace ParkingManagementAPI.Migrations
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<string>("camera_id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParkingSpaceId");
-
-                    b.ToTable("Orders");
+                    b.ToTable("CustomerOrders");
                 });
 
             modelBuilder.Entity("ParkingManagementAPI.Models.ParkingSpace", b =>
@@ -112,17 +116,6 @@ namespace ParkingManagementAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SystemUsers");
-                });
-
-            modelBuilder.Entity("ParkingManagementAPI.Models.Order", b =>
-                {
-                    b.HasOne("ParkingManagementAPI.Models.ParkingSpace", "ParkingSpace")
-                        .WithMany()
-                        .HasForeignKey("ParkingSpaceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ParkingSpace");
                 });
 #pragma warning restore 612, 618
         }
