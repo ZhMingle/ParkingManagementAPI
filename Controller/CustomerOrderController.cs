@@ -26,11 +26,15 @@ namespace ParkingManagementAPI.Controller
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CustomerOrder>>> GetOrders([FromQuery] PagingParametersDTO pagingParameters)
         {
-            return await _context.CustomerOrders
+            var total = await _context.CustomerOrders.CountAsync();
+            var orders = await _context.CustomerOrders
                 .OrderBy(o => o.StartTime)
                  .Skip((pagingParameters.PageNumber - 1) * pagingParameters.PageSizeLimit)
             .Take(pagingParameters.PageSizeLimit)
                 .ToListAsync();
+            // 返回分页数据和总条数
+            var pagedResponse = new PagedResponse<CustomerOrder>(orders, total);
+            return Ok(pagedResponse);
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<CustomerOrder>> GetOrder(int id)
