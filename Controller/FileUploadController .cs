@@ -8,11 +8,13 @@ using Newtonsoft.Json;
 using ParkingManagementAPI.Models;
 using ParkingManagementAPI.Controller;
 using ParkingManagementAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ParkingManagementAPI.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class FileUploadController : ControllerBase
     {
         private readonly IWebHostEnvironment _env;
