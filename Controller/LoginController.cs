@@ -62,11 +62,10 @@ public class AuthController : ControllerBase
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.Name, "admin")
-            }),
-            Expires = DateTime.UtcNow.AddHours(1),  // Token 1小时后过期
+
+            Expires = DateTime.UtcNow.AddHours(10),  // Token 10小时后过期
+            Issuer = _config["Jwt:Issuer"],  // 添加Issuer
+            Audience = _config["Jwt:Audience"],  // 添加Audience
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 

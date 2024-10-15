@@ -8,11 +8,13 @@ using ParkingManagementAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using ParkingManagementAPI.Models.DTO;
 using ParkingManagementAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ParkingManagementAPI.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CustomerOrderController : ControllerBase
     {
         private readonly SmartParkingContext _context;

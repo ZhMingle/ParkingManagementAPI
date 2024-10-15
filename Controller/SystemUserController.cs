@@ -5,6 +5,7 @@ using ParkingManagementAPI.Models;
 using ParkingManagementAPI.Models.DTO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ParkingManagementAPI.Controllers
 {
@@ -23,6 +24,13 @@ namespace ParkingManagementAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SystemUser>>> GetSystemUsers()
         {
+            var authHeader = Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrEmpty(authHeader))
+            {
+                return Unauthorized("No Authorization header found");
+            }
+
+            Console.WriteLine($"Authorization Header33: {authHeader}");
             return await _context.SystemUsers.ToListAsync();
         }
 
@@ -64,10 +72,10 @@ namespace ParkingManagementAPI.Controllers
                 Username = createSystemUser.Username,
                 Email = createSystemUser.Email,
                 PhoneNumber = createSystemUser.PhoneNumber,
-                PasswordHash = PasswordHash,  
+                PasswordHash = PasswordHash,
                 IsActive = createSystemUser.IsActive,
                 Role = createSystemUser.Role,
-                CreateAt = DateTime.UtcNow 
+                CreateAt = DateTime.UtcNow
             };
 
 
