@@ -17,5 +17,8 @@ namespace ParkingManagementAPI.Models
         public DateTime? EndTime { get; set; } = null; // 出停车场的时间
         public decimal Price { get; set; }
 
+        public int SpotNumber {get; set;}
+        
+
     }
 }

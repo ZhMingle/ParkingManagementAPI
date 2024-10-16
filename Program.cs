@@ -22,13 +22,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ClockSkew = TimeSpan.FromMinutes(5)  // Allow a 5-minute clock skew
+
         };
         // 添加日志记录事件
         options.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
             {
+                // Check if the token is in the Authorization header
+                var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+                context.Token = token;
                 Console.WriteLine($"Token received: {context.Token}");  // 打印接收到的Token
                 return Task.CompletedTask;
             },

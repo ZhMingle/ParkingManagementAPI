@@ -57,19 +57,22 @@ public class AuthController : ControllerBase
     private string GenerateJwtToken()
     {
         var tokenHandler = new JwtSecurityTokenHandler();
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));  // Ensure this key is secure and long enough
 
-        var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]);  // 这应该是一个更安全的密钥
-
+        // Set up the token descriptor
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-
-            Expires = DateTime.UtcNow.AddHours(10),  // Token 10小时后过期
-            Issuer = _config["Jwt:Issuer"],  // 添加Issuer
-            Audience = _config["Jwt:Audience"],  // 添加Audience
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            Expires = DateTime.UtcNow.AddMinutes(30),  // Token expires in 30 minutes
+            SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256),
+            Issuer = _config["Jwt:Issuer"],  // Optional: set if you validate the issuer
+            Audience = _config["Jwt:Audience"]  // Optional: set if you validate the audience
         };
 
+        // Create the token
         var token = tokenHandler.CreateToken(tokenDescriptor);
+
+        // Return the token as a string
         return tokenHandler.WriteToken(token);
+
     }
 }

@@ -68,17 +68,23 @@ namespace ParkingManagementAPI.Controller
                 return BadRequest("Failed to recognize plate number.");
             }
             // 创建订单
-            var newOrder = new CustomerOrder
+            if (cameraId == "1")
             {
-                PlateNumber = plateNumber,
-                PlateImage = filePath, // 假设你已经存储了图片并获取其 URL
-                Status = 1, // 进入停车场，状态设置为 active
-                camera_id = cameraId,
-                StartTime = DateTime.Now, // 设置进入停车场的时间
-                EndTime = null,
-                Price = 0, // 初始价格为 0，可以在离场时计算价格
-            };
-            await _customerOrderService.CreateOrderAsync(newOrder);
+                int randomNumber = new Random().Next(1, 69);
+                var newOrder = new CustomerOrder
+                {
+                    PlateNumber = plateNumber,
+                    PlateImage = filePath, // 假设你已经存储了图片并获取其 URL
+                    Status = 1, // 进入停车场，状态设置为 active
+                    camera_id = cameraId,
+                    StartTime = DateTime.Now, // 设置进入停车场的时间
+                    EndTime = null,
+                    Price = 0, // 初始价格为 0，可以在离场时计算价格
+                    SpotNumber = randomNumber // 1-68的随机数
+                };
+                await _customerOrderService.CreateOrderAsync(newOrder);
+            }
+
 
 
             return Ok(new { FilePath = filePath, recognitionResult });

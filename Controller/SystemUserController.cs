@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace ParkingManagementAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class SystemUserController : ControllerBase
