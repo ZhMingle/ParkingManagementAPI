@@ -69,6 +69,7 @@ namespace ParkingManagementAPI.Controller
             {
                 return BadRequest("Failed to recognize plate number.");
             }
+            plateNumber = plateNumber.ToUpper();
             var PlateImage = $"http://localhost:5240/Uploads/{newFileName}";
 
             // 创建订单
