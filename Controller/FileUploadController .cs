@@ -9,12 +9,12 @@ using ParkingManagementAPI.Models;
 using ParkingManagementAPI.Controller;
 using ParkingManagementAPI.Services;
 using Microsoft.AspNetCore.Authorization;
+using ParkingManagementAPI.Enum;
 
 namespace ParkingManagementAPI.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class FileUploadController : ControllerBase
     {
         private readonly IWebHostEnvironment _env;
@@ -35,10 +35,6 @@ namespace ParkingManagementAPI.Controller
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded.");
 
-            Console.WriteLine($"WebRootPath: {_env.WebRootPath}");
-            Console.WriteLine($"FileName: {file.FileName}");
-
-
             // 设置保存路径，可以将图片存到服务器本地的 "Uploads" 目录下
             var uploadPath = Path.Combine(_env.WebRootPath, "Uploads");
 
@@ -49,8 +45,14 @@ namespace ParkingManagementAPI.Controller
             {
                 Directory.CreateDirectory(uploadPath);
             }
+            // 获取文件的扩展名
+            var fileExtension = Path.GetExtension(file.FileName);
 
-            var filePath = Path.Combine(uploadPath, file.FileName);
+            // 使用时间戳生成唯一文件名
+            var timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssfff"); // 年月日时分秒毫秒
+            var newFileName = $"{Path.GetFileNameWithoutExtension(file.FileName)}_{timeStamp}{fileExtension}";
+
+            var filePath = Path.Combine(uploadPath, newFileName);
 
             // 将文件保存到指定路径
             using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -67,6 +69,8 @@ namespace ParkingManagementAPI.Controller
             {
                 return BadRequest("Failed to recognize plate number.");
             }
+            var PlateImage = $"http://localhost:5240/Uploads/{newFileName}";
+
             // 创建订单
             if (cameraId == "1")
             {
@@ -74,8 +78,8 @@ namespace ParkingManagementAPI.Controller
                 var newOrder = new CustomerOrder
                 {
                     PlateNumber = plateNumber,
-                    PlateImage = filePath, // 假设你已经存储了图片并获取其 URL
-                    Status = 1, // 进入停车场，状态设置为 active
+                    PlateImage = PlateImage, // 假设你已经存储了图片并获取其 URL
+                    Status = OrderStatus.Active, // 进入停车场，状态设置为 active
                     camera_id = cameraId,
                     StartTime = DateTime.Now, // 设置进入停车场的时间
                     EndTime = null,
@@ -83,6 +87,33 @@ namespace ParkingManagementAPI.Controller
                     SpotNumber = randomNumber // 1-68的随机数
                 };
                 await _customerOrderService.CreateOrderAsync(newOrder);
+            }
+            else if (cameraId == "2")
+            {
+                // 当 cameraId 为 2 时，更新订单状态为已完成，并计算费用
+                var existingOrder = await _customerOrderService.GetOrderByPlateNumberAsync(plateNumber);
+                if (existingOrder == null)
+                {
+                    return NotFound("Order not found for the given plate number.");
+                }
+
+                // 更新订单状态为已完成
+                existingOrder.Status = OrderStatus.Completed; // 使用枚举表示完成状态
+                existingOrder.EndTime = DateTime.Now; // 设置当前时间为离场时间
+
+                // 计算停车时长并计算费用
+                if (existingOrder.StartTime.HasValue)
+                {
+                    var duration = existingOrder.EndTime.Value - existingOrder.StartTime.Value;
+                    double totalMinutes = duration.TotalMinutes;
+
+                    // 每半小时 2 美元
+                    double halfHourUnits = Math.Ceiling(totalMinutes / 30); // 向上取整，至少收 0.5 小时费用
+                    existingOrder.Price = (decimal)halfHourUnits * 2; // 每 0.5 小时 2 美元
+                }
+
+                // 保存更新后的订单
+                await _customerOrderService.UpdateOrderAsync(existingOrder);
             }
 
 

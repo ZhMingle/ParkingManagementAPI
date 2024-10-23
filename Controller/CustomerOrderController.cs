@@ -9,12 +9,12 @@ using Microsoft.EntityFrameworkCore;
 using ParkingManagementAPI.Models.DTO;
 using ParkingManagementAPI.Services;
 using Microsoft.AspNetCore.Authorization;
+using ParkingManagementAPI.Enum;
 
 namespace ParkingManagementAPI.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class CustomerOrderController : ControllerBase
     {
         private readonly SmartParkingContext _context;
@@ -46,6 +46,26 @@ namespace ParkingManagementAPI.Controller
             if (order == null) return NotFound();
             return order;
         }
+        // 根据车牌号查询订单的接口
+        [HttpGet("plate/{plateNumber}")]
+        public async Task<IActionResult> GetOrderByPlateNumber(string plateNumber)
+        {
+            if (string.IsNullOrWhiteSpace(plateNumber))
+            {
+                return BadRequest("Plate number is required.");
+            }
+
+            var order = await _customerOrderService.GetOrderByPlateNumberAsync(plateNumber);
+
+            if (order == null)
+            {
+                return NotFound($"No order found for plate number: {plateNumber}");
+            }
+
+            return Ok(order);
+        }
+
+
 
         // POST: api/order
         [HttpPost]
@@ -106,5 +126,6 @@ namespace ParkingManagementAPI.Controller
         {
             return _context.CustomerOrders.Any(e => e.Id == id);
         }
+
     }
 }
